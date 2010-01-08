@@ -1,4 +1,4 @@
-﻿class Variables:
+class Variables:
     aliases = ('variables', 'vars', )
     description = 'Shows stored variables'
  

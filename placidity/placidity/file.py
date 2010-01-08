@@ -1,4 +1,4 @@
-﻿import os.path
+import os.path
 import inspect
 import imp
 import os

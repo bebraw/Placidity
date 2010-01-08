@@ -1,4 +1,4 @@
-﻿import os
+import os
 import tempfile
 from mock import patch
 from placidity.file import File

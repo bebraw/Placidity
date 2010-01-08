@@ -1,4 +1,4 @@
-﻿class SpecificHelp:
+class SpecificHelp:
  
     def __init__(self, target_name):
         '''

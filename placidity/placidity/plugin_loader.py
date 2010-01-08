@@ -1,4 +1,4 @@
-﻿class PluginLoader:
+class PluginLoader:
 
     def load(self, directory):
         ret = []

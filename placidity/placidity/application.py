@@ -1,4 +1,4 @@
-﻿from file import PluginDirectory
+from file import PluginDirectory
 from interpreter import Interpreter
 from plugin_loader import PluginLoader
  

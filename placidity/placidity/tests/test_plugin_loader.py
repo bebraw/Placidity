@@ -1,4 +1,4 @@
-﻿from mock import Mock
+from mock import Mock
 from placidity.plugin_loader import PluginLoader
 
 class Alias:

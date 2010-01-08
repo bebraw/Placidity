@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 class AbstractNode(object):
     def _generic_find(self, node_list_name, **kvargs):
         found_nodes = self._generic_recursion(node_list_name, kvargs, [], [])

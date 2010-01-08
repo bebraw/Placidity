@@ -1,4 +1,4 @@
-﻿class Clean:
+class Clean:
     aliases = 'clean'
     description = 'Cleans up stored variables'
  

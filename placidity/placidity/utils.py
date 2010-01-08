@@ -1,4 +1,4 @@
-﻿class Operations(tuple):
+class Operations(tuple):
  
     def __new__(cls, *args):
         class Operation:
