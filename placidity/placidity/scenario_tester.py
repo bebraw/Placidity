@@ -40,7 +40,7 @@ class ScenarioTester:
     def _parse_scenario(self, scenario):
         self.lines.clear()
 
-        for line in scenario.split():
+        for line in scenario.split('\n'):
             parsed_line = parse_line(line)
 
             if parsed_line:
@@ -50,18 +50,20 @@ class ScenarioTester:
         current_line = self.lines.popleft()
 
         if isinstance(current_line, Input):
-            return current_line
-
-        assert False, 'Expected input but got output instead!' + \
-            ' Failed at line "%s".' % current_line
+            return str(current_line)
+        else:
+            assert False, 'Expected input but got output instead!' + \
+                ' Failed at line "%s".' % current_line
 
     def _output(self, result):
         current_line = self.lines.popleft()
 
         if isinstance(current_line, Output):
-            assert result == current_line, \
+            content = current_line.content
+            assert content == result, \
                 "Output content didn't match!' + \
-                'Expected %s but got %s instead." \
-                % (current_line, result)
-
-        assert False, 'Expected output but got input instead!'
+                'Expected %s (%s) but got %s (%s) instead." \
+                % (content, type(content), result, type(result))
+        else:
+            assert False, 'Expected output but got input instead!' + \
+                ' Failed at line "%s". Result: %s.' % (current_line, result)

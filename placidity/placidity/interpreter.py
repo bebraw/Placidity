@@ -22,7 +22,7 @@ class Interpreter:
 
     def interpret(self, expression):
         try:
-            return eval(expression, {}, self.vars)
+            return str(eval(expression, {}, self.vars))
         except NameError:
             matching_command = self.commands.match(expression)
 
