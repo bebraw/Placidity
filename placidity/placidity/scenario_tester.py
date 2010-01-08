@@ -1,5 +1,14 @@
 from collections import deque
 
+class InputException(Exception):
+    pass
+
+class MatchException(Exception):
+    pass
+
+class OutputException(Exception):
+    pass
+
 class Line:
     def __init__(self, content):
         self.content = content
@@ -34,10 +43,10 @@ class ScenarioTester:
         self.lines = deque()
 
     def test(self, scenario):
-        self._parse_scenario(scenario)
+        self.parse(scenario)
         self.app.run()
 
-    def _parse_scenario(self, scenario):
+    def parse(self, scenario):
         self.lines.clear()
 
         for line in scenario.split('\n'):
@@ -52,7 +61,7 @@ class ScenarioTester:
         if isinstance(current_line, Input):
             return str(current_line)
         else:
-            assert False, 'Expected input but got output instead!' + \
+            raise InputException, 'Expected input but got output instead!' + \
                 ' Failed at line "%s".' % current_line
 
     def _output(self, result):
@@ -60,10 +69,11 @@ class ScenarioTester:
 
         if isinstance(current_line, Output):
             content = current_line.content
-            assert content == result, \
-                "Output content didn't match!' + \
-                'Expected %s (%s) but got %s (%s) instead." \
-                % (content, type(content), result, type(result))
+
+            if content != result:
+                raise MatchException, "Output content didn't match!" + \
+                    " Expected %s (%s) but got %s (%s) instead." \
+                    % (content, type(content), result, type(result))
         else:
-            assert False, 'Expected output but got input instead!' + \
+            raise OutputException, 'Expected output but got input instead!' + \
                 ' Failed at line "%s". Result: %s.' % (current_line, result)
