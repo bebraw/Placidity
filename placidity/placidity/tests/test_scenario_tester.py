@@ -1,5 +1,7 @@
 from placidity.scenario_tester import ScenarioTester
 
+# TODO: test exceptions!
+
 class TestScenarioTester:
     def test_test(self):
         class Application:
