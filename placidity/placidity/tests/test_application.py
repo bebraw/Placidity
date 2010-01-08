@@ -16,16 +16,14 @@ class TestApplication:
 
         self.scenario_tester.test(scenario)
 
-# TODO: figure out why 'a = 5' etc. fail!
-# test
-#>>> c
-#null
     def test_variables(self):
         scenario = '''
->>> a=5
->>> b=10
+>>> a = 5
+>>> b = 10
 >>> a
 5
+>>> c
+null
 >>> vars
 Stored variables:
 a=5

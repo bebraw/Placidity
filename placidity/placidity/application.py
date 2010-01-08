@@ -14,8 +14,7 @@ class Application:
             input = self.input()
             result = interpreter.interpret(input)
 
-            if result and result != 'null':
-                self.output(result)
+            self.output(result)
 
     def input(self):
         return raw_input()
