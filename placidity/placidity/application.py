@@ -11,4 +11,16 @@ class Application:
         interpreter = Interpreter(commands)
  
         while True:
-            print interpreter.interpret(raw_input())
+            input = self.input()
+            result = interpreter.interpret(input)
+
+            # output logic goes here!
+            
+            # output ok result
+            self.output(result)
+
+    def input(self):
+        return raw_input()
+
+    def output(self, result):
+        print result
