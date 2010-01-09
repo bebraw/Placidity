@@ -17,7 +17,7 @@ class Application:
             self.output(result)
 
     def input(self):
-        return raw_input()
+        return raw_input('>>> ')
 
     def output(self, result):
         print result

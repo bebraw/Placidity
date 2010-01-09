@@ -1,8 +1,20 @@
+from mock import patch
 from placidity.application import Application
 from placidity.scenario_tester import ScenarioTester
 
 class TestApplication:
     scenario_tester = ScenarioTester(Application)
+
+    @patch('__builtin__.raw_input')
+    def test_input_prefix(self, input_mock):
+        # Note that prefix has to be tested separately as scenario tester
+        # operates only on pure input. It just happens to use the same syntax
+        # for input.
+        app = Application()
+
+        app.input()
+
+        input_mock.assert_called_with('>>> ')
 
     def test_math(self):
         scenario = '''
