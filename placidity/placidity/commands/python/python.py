@@ -9,15 +9,20 @@ class Python:
         '''
         >>> python = Python()
 
-        >>> variables = {}
-        >>> python.execute('5+13', variables)
+        >>> python.execute('5+13', {})
         18
 
-        >>> variables = {'a':13, }
-        >>> python.execute('a+7', variables)
+        >>> python.execute('a+7', {'a': 13, })
         20
+
+        >>> python.execute('foobar', {})
+        "NameError: name 'foobar' is not defined"
         '''
-        return eval(expression, {}, variables)
+        try:
+            return eval(expression, {}, variables)
+        except Exception, e:
+            class_name = e.__class__.__name__
+            return class_name + ': ' + str(e)
 
 if __name__ == "__main__":
     import doctest
