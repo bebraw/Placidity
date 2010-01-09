@@ -42,7 +42,7 @@ class TestAlias(AbstractTest):
         class Alias:
             aliases = 'foo'
 
-        alias = self.load_plugin(self.Alias)
+        alias = self.load_plugin(Alias)
 
         assert alias.matches('foo')
         assert not alias.matches('bar')
@@ -51,7 +51,7 @@ class TestAlias(AbstractTest):
         class NoAlias:
             pass
 
-        no_alias = self.load_plugin(self.NoAlias)
+        no_alias = self.load_plugin(NoAlias)
 
         assert no_alias.aliases == ''
 
@@ -66,7 +66,6 @@ class TestAlias(AbstractTest):
         assert not multiple_aliases.matches('foobar')
 
 class TestLoadPlugins(AbstractTest):
-
     def test_load_plugins(self):
         def produce_classes(class_names):
             def produce_class(class_name):
