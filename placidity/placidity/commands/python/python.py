@@ -1,5 +1,4 @@
 class Python:
-    # TODO: make it possible to actually run Python interpeter as an app
     priority = 'low'
 
     def matches(self, expression):
