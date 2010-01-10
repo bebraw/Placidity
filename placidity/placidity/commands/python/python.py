@@ -6,6 +6,8 @@ class Python:
 
     def execute(self, expression, variables):
         '''
+        >>> from py.test import raises
+
         >>> python = Python()
 
         >>> python.execute('5+13', {})
@@ -14,14 +16,11 @@ class Python:
         >>> python.execute('a+7', {'a': 13, })
         20
 
-        >>> python.execute('foobar', {})
-        "NameError: name 'foobar' is not defined"
+        >>> exception = raises(NameError, python.execute, 'foobar', {})
+        >>> exception.typename
+        'NameError'
         '''
-        try:
-            return eval(expression, {}, variables)
-        except Exception, e:
-            class_name = e.__class__.__name__
-            return class_name + ': ' + str(e)
+        return eval(expression, {}, variables)
 
 if __name__ == "__main__":
     import doctest
