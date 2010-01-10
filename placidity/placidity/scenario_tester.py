@@ -1,12 +1,12 @@
 from collections import deque
 
-class InputException(Exception):
+class InputError(Exception):
     pass
 
-class MatchException(Exception):
+class MatchError(Exception):
     pass
 
-class OutputException(Exception):
+class OutputError(Exception):
     pass
 
 class Line:
@@ -61,7 +61,7 @@ class ScenarioTester:
         if isinstance(current_line, Input):
             return str(current_line)
         else:
-            raise InputException, 'Expected input but got output instead!' + \
+            raise InputError, 'Expected input but got output instead!' + \
                 ' Failed at line "%s".' % current_line
 
     def _output(self, result):
@@ -71,9 +71,9 @@ class ScenarioTester:
             content = current_line.content
 
             if content != result:
-                raise MatchException, "Output content didn't match!" + \
+                raise MatchError, "Output content didn't match!" + \
                     " Expected %s (%s) but got %s (%s) instead." \
                     % (content, type(content), result, type(result))
         else:
-            raise OutputException, 'Expected output but got input instead!' + \
+            raise OutputError, 'Expected output but got input instead!' + \
                 ' Failed at line "%s". Result: %s.' % (current_line, result)

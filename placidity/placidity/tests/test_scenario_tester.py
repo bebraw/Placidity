@@ -1,5 +1,5 @@
-from placidity.scenario_tester import Input, InputException, MatchException, \
-Output, OutputException, ScenarioTester
+from placidity.scenario_tester import Input, InputError, MatchError, \
+Output, OutputError, ScenarioTester
 from py.test import raises
 
 class AbstractApplication:
@@ -58,7 +58,7 @@ fail
         assert len(lines) == 1
         self.assert_line(lines, 1, Output, 'fail')
 
-        raises(InputException, scenario_tester.test, scenario)
+        raises(InputError, scenario_tester.test, scenario)
 
     def test_match_fail(self):
         class Application(AbstractApplication):
@@ -81,7 +81,7 @@ fail
         self.assert_line(lines, 2, Input, 'a')
         self.assert_line(lines, 3, Output, '5')
 
-        raises(MatchException, scenario_tester.test, scenario)
+        raises(MatchError, scenario_tester.test, scenario)
 
     def test_output_fail(self):
         class Application(AbstractApplication):
@@ -101,7 +101,7 @@ fail
         self.assert_line(lines, 1, Input, 'fail')
         self.assert_line(lines, 2, Input, 'fail')
 
-        raises(OutputException, scenario_tester.test, scenario)
+        raises(OutputError, scenario_tester.test, scenario)
 
     def assert_line(self, lines, line_number, line_type, line_content):
         line = lines[line_number - 1]
