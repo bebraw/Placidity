@@ -23,8 +23,8 @@ class Assignment:
         >>> assignment.matches('a=b')
         True
 
-        Underscore is allowed in the beginning and minus in the middle
-        >>> assignment.matches('_foo-DOO=bar')
+        Underscore is allowed in the beginning
+        >>> assignment.matches('_fooDOO=bar')
         True
 
         >>> assignment.matches('a=b+5')
@@ -53,23 +53,28 @@ class Assignment:
         >>> assignment.matches('a, -b = 5, 10')
         False
 
-        Allow because expands to FOO = FOO - b
+        Disallow minus in middle of a name because "foo-doo" is
+        ambiguous
+        >>> assignment.matches('foo-doo=b')
+        False
+
+        - expansion
         >>> assignment.matches('FOO-=b')
         True
 
-        Allow because expands to FOO = FOO + b
+        + expansion
         >>> assignment.matches('FOO+=b')
         True
 
-        Allow because expands to FOO = FOO * b
+        * expansion
         >>> assignment.matches('FOO*=b')
         True
 
-        Allow because expands to FOO = FOO / b
+        / expansion
         >>> assignment.matches('FOO/=b')
         True
 
-        Allow because expands to FOO = FOO % b
+        % expansion
         >>> assignment.matches('FOO%=b')
         True
         '''
@@ -83,13 +88,12 @@ class Assignment:
         if len(parts) == 2 and len(parts[0].segments) == 1:
             l_part = parts[0].segments[0]
 
-            if not re.match('^[a-zA-Z_]{1}[a-zA-Z-_]*[/+/-/*/%//]{0,1}$',
-                    l_part):
+            if not l_part.is_valid():
                 return False
         else:
             for part in parts[:-1]:
                 for segment in part.segments:
-                    if not re.match('^[a-zA-Z_]{1}[a-zA-Z-_]*$', segment):
+                    if not segment.is_valid():
                         return False
 
         return True
@@ -256,31 +260,35 @@ class Assignment:
                     return ret
 
     def _split_expression(self, expression):
+        class Segment(str):
+            def is_valid(self):
+                return re.match('^[a-zA-Z_]{1}[a-zA-Z_]*$', self)
+
         class Part:
             def __init__(self, value):
                 value = value.strip()
 
                 if value[-1] in ('+', '-', '*', '/', '%'):
                     self.expansion = value[-1]
-                    self.value = value[:-1]
+                    self.segments = (Segment(value[:-1]), )
                 else:
                     self.expansion = None
-                    self.value = value
+                    self.segments = (Segment(value), )
 
             def expand(self, l_part):
                 expansion = l_part.expansion
 
                 if expansion:
-                    self.value = l_part.value + expansion + self.value
-
-            @property
-            def segments(self):
-                return (self.value, )
+                    self.segments = (l_part.segments[0] + expansion + \
+                        self.segments[0], )
 
         class SegmentedPart:
             def __init__(self, raw_part):
                 segments = raw_part.split(',')
-                self.segments = [segment.strip() for segment in segments]
+
+                self.segments = []
+                for segment in segments:
+                    self.segments.append(Segment(segment.strip()))
 
         expression = expression.strip()
         parts = expression.split('=')

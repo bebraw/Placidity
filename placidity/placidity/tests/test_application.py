@@ -34,6 +34,10 @@ class TestApplication:
 >>> b = 10
 >>> a
 5
+>>> c
+null
+>>> a = c
+null
 >>> vars
 Stored variables:
 a=5
