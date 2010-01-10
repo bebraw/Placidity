@@ -1,7 +1,7 @@
 import inspect
 
 class Commands(list):
-    def __init__(self, commands):
+    def __init__(self, commands=None):
         commands = commands if commands else []
 
         if not hasattr(commands, '__iter__'):
@@ -19,8 +19,16 @@ class Commands(list):
                 if command.matches(expression):
                     return command
 
-    def find(self, priority):
-        return filter(lambda command: command.priority == priority, self)
+    def find(self, name=None, priority=None):
+        if name:
+            for command in self:
+                class_name = command.__class__.__name__
+
+                if class_name.lower() == name:
+                    return command
+
+        if priority:
+            return filter(lambda command: command.priority == priority, self)
 
 class Interpreter:
 

@@ -1,10 +1,48 @@
 from mock import Mock
-from placidity.interpreter import Interpreter
+from placidity.interpreter import Commands, Interpreter
 
 # TODO: convert execute asserts to assert_called_with and handle
 # return with return_value. Note that it's possible to mock the
 # signatures in Mock 0.7 (fix after release or include svn version in
 # /lib)
+
+class TestCommands:
+    def test_find_single(self):
+        class Foo:
+            pass
+
+        command = Foo()
+
+        commands = Commands(command)
+
+        assert commands.find(name='foo') == command
+
+    def test_find_nothing(self):
+        commands = Commands()
+
+        assert commands.find(name='foo') == None
+
+    def test_find_based_on_priority(self):
+        class Bar:
+            priority = 'low'
+
+        class Foo:
+            priority = 'normal'
+
+        class Help:
+            priority = 'normal'
+
+        command1 = Bar()
+        command2 = Foo()
+        command3 = Help()
+
+        commands = Commands((command1, command2, command3))
+
+        assert commands.find(priority='low') == [command1, ]
+
+        multiple = commands.find(priority='normal')
+        assert command2 in multiple
+        assert command3 in multiple
 
 class TestInterpreter:
     def test_exception(self):
