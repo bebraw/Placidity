@@ -63,7 +63,7 @@ Cleans up stored variables
 >>> a
 5
 >>> eliza
-...
+Hello. How are you feeling today?
 >>> a
 ...
 >>> Yeah. Right!
