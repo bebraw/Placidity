@@ -45,6 +45,7 @@ class Interpreter:
             args = self._get_args(command.execute)
             params = self._find_parameters(possible_parameters, args)
 
+            print command
             return command.execute(**params)
         except:
             return 'null'

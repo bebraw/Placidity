@@ -14,7 +14,8 @@ class Application:
             input = self.input()
             result = interpreter.interpret(input)
 
-            self.output(result)
+            if result is not None:
+                self.output(result)
 
     def input(self):
         return raw_input('>>> ')

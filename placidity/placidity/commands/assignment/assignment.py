@@ -58,6 +58,14 @@ class Assignment:
         >>> assignment.matches('foo-doo=b')
         False
 
+        Don't match if missing =
+        >>> assignment.matches('a + b')
+        False
+
+        Don't match empty
+        >>> assignment.matches('')
+        False
+
         - expansion
         >>> assignment.matches('FOO-=b')
         True
@@ -79,6 +87,9 @@ class Assignment:
         True
         '''
         parts = self._split_expression(expression)
+
+        if len(parts) < 2:
+            return False
 
         first_segments_len = len(parts[0].segments)
         for part in parts:
@@ -261,7 +272,7 @@ class Assignment:
             def __init__(self, value):
                 value = value.strip()
 
-                if value[-1] in ('+', '-', '*', '/', '%'):
+                if len(value) > 0 and value[-1] in ('+', '-', '*', '/', '%'):
                     self.expansion = value[-1]
                     self.segments = (Segment(value[:-1]), )
                 else:
