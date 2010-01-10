@@ -56,3 +56,22 @@ Cleans up stored variables
 '''
 
         self.scenario_tester.test(scenario)
+
+    def test_eliza(self):
+        scenario = '''
+>>> a = 5
+>>> a
+5
+>>> eliza
+...
+>>> a
+...
+>>> Yeah. Right!
+...
+>>> quit
+...
+>>> a
+5
+'''
+
+        self.scenario_tester.test(scenario)
