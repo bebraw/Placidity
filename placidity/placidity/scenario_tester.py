@@ -70,7 +70,7 @@ class ScenarioTester:
         if isinstance(current_line, Output):
             content = current_line.content
 
-            if content != result:
+            if content != str(result):
                 raise MatchError, "Output content didn't match!" + \
                     " Expected %s (%s) but got %s (%s) instead." \
                     % (content, type(content), result, type(result))

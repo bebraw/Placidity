@@ -20,7 +20,7 @@ class TestScenarioTester:
         class Application(AbstractApplication):
             def interpret(self, input):
                 if input == 'a':
-                    return '4'
+                    return 4
 
         scenario = '''
 >>> a = 4
