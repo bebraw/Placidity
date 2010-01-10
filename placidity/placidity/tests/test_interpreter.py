@@ -12,6 +12,15 @@ class TestInterpreter:
 
         assert interpreter.interpret('foobar') == 'null'
 
+    def test_no_return(self):
+        def execute():
+            pass
+        command = self.create_command('foo', execute_method=execute)
+
+        interpreter = Interpreter(command)
+
+        assert interpreter.interpret('foo') == None
+
     def test_priority(self):
         def execute_1():
             return 'foo'
