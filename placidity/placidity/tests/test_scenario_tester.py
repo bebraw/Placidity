@@ -1,5 +1,5 @@
-from placidity.scenario_tester import Input, InputError, MatchError, \
-Output, OutputError, ScenarioTester
+from placidity.scenario_tester import EllipsisOutput, Input, InputError, \
+MatchError, Output, OutputError, ScenarioTester
 from py.test import raises
 
 class AbstractApplication:
@@ -38,6 +38,29 @@ class TestScenarioTester:
         self.assert_line(lines, 3, Output, '4')
 
         # this should not trigger any asserts
+        scenario_tester.test(scenario)
+
+    def test_ellipsis(self):
+        class Application(AbstractApplication):
+            def interpret(self, input):
+                if input == 'a':
+                    return 5
+
+        scenario = '''
+>>> a = 5
+>>> a
+...
+'''
+
+        scenario_tester = ScenarioTester(Application)
+        scenario_tester.parse(scenario)
+        lines = scenario_tester.lines
+
+        assert len(lines) == 3
+        self.assert_line(lines, 1, Input, 'a = 5')
+        self.assert_line(lines, 2, Input, 'a')
+        self.assert_line(lines, 3, EllipsisOutput, None)
+
         scenario_tester.test(scenario)
 
     def test_input_fail(self):
