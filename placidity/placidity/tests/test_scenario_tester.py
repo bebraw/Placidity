@@ -4,16 +4,16 @@ from py.test import raises
 
 class AbstractApplication:
     def run(self):
-        while True:
-            input = self.input()
+        try:
+            while True:
+                input = self.input()
 
-            if input == 'quit':
-                break
+                result = self.interpret(input)
 
-            result = self.interpret(input)
-
-            if result:
-                self.output(result)
+                if result:
+                    self.output(result)
+        except SystemExit:
+            pass
 
 class TestScenarioTester:
     def test_passing_test(self):
@@ -26,18 +26,16 @@ class TestScenarioTester:
 >>> a = 4
 >>> a
 4
->>> quit
 '''
 
         scenario_tester = ScenarioTester(Application)
         scenario_tester.parse(scenario)
         lines = scenario_tester.lines
 
-        assert len(lines) == 4
+        assert len(lines) == 3
         self.assert_line(lines, 1, Input, 'a = 4')
         self.assert_line(lines, 2, Input, 'a')
         self.assert_line(lines, 3, Output, '4')
-        self.assert_line(lines, 4, Input, 'quit')
 
         # this should not trigger any asserts
         scenario_tester.test(scenario)

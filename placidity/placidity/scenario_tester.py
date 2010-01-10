@@ -56,6 +56,9 @@ class ScenarioTester:
                 self.lines.append(parsed_line)
 
     def _input(self):
+        if len(self.lines) == 0:
+            raise SystemExit
+
         current_line = self.lines.popleft()
 
         if isinstance(current_line, Input):

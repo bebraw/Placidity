@@ -9,13 +9,16 @@ class Application:
         plugin_directory = PluginDirectory()
         commands = plugin_loader.load(plugin_directory)
         interpreter = Interpreter(commands)
- 
-        while True:
-            input = self.input()
-            result = interpreter.interpret(input)
 
-            if result is not None:
-                self.output(result)
+        try:
+            while True:
+                input = self.input()
+                result = interpreter.interpret(input)
+
+                if result is not None:
+                    self.output(result)
+        except SystemExit:
+            pass
 
     def input(self):
         return raw_input('>>> ')
