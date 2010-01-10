@@ -1,10 +1,30 @@
 from mock import Mock
-from placidity.interpreter import Commands, Interpreter
+from placidity.interpreter import Context, Commands, Interpreter
 
 # TODO: convert execute asserts to assert_called_with and handle
 # return with return_value. Note that it's possible to mock the
 # signatures in Mock 0.7 (fix after release or include svn version in
 # /lib)
+
+class TestContext:
+    def setup_method(self, method):
+        self.context = Context()
+
+    def test_claim_for(self):
+        assert self.context.owner == None
+
+        self.context.claim_for('foobar')
+
+        assert self.context.owner == 'foobar'
+
+    def test_release(self):
+        self.context.claim_for('barfoo')
+
+        assert self.context.owner == 'barfoo'
+
+        self.context.release()
+
+        assert self.context.owner == None
 
 class TestCommands:
     def test_find_single(self):
@@ -50,6 +70,24 @@ class TestInterpreter:
 
         assert interpreter.interpret('foobar') == 'null'
 
+    def test_context_owner_set(self):
+        def execute_1():
+            return 'foo'
+        command1 = self.create_command('foobar', execute_method=execute_1)
+
+        def execute_2(expression):
+            if expression == 'foobar':
+                return None
+            
+            return 'bar'
+        command2 = self.create_command('bar', execute_method=execute_2)
+
+        interpreter = Interpreter([command1, command2])
+        interpreter.context.claim_for(command2)
+
+        assert interpreter.interpret('foobar') == None
+        assert interpreter.interpret('bar') == 'bar'
+
     def test_no_return(self):
         def execute():
             pass
@@ -80,6 +118,11 @@ class TestInterpreter:
         def no_parameters():
             return 'executed command'
 
+        def with_context(context):
+            assert context.owner == None
+
+            return 'executed command'
+
         def with_commands(commands):
             assert commands == [command, ]
 
@@ -96,15 +139,16 @@ class TestInterpreter:
             return 'executed command'
 
         def with_multiple_parameters(expression, commands,
-                variables):
+                variables, context):
+            assert context.owner == None
             assert commands == [command, ]
             assert expression == 'command'
             assert variables == {}
 
             return 'executed command'
 
-        execute_methods = (no_parameters, with_commands, with_expression, \
-            with_variables, with_multiple_parameters, )
+        execute_methods = (no_parameters, with_context, with_commands,
+            with_expression, with_variables, with_multiple_parameters, )
 
         command = self.create_command('command')
         interpreter = Interpreter(command)

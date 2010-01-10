@@ -1,5 +1,14 @@
 import inspect
 
+class Context:
+    owner = None
+
+    def claim_for(self, owner):
+        self.owner = owner
+
+    def release(self):
+        self.owner = None
+
 class Commands(list):
     def __init__(self, commands=None):
         commands = commands if commands else []
@@ -31,17 +40,22 @@ class Commands(list):
             return filter(lambda command: command.priority == priority, self)
 
 class Interpreter:
-
     def __init__(self, commands=None):
+        self.context = Context()
         self.commands = Commands(commands)
         self.variables = {}
 
     def interpret(self, expression):
-        possible_parameters = {'commands': self.commands,
-            'expression': expression, 'variables': self.variables}
+        possible_parameters = {'context': self.context,
+            'commands': self.commands, 'expression': expression,
+            'variables': self.variables}
 
         try:
-            command = self.commands.match(expression)
+            if self.context.owner:
+                command = self.context.owner
+            else:
+                command = self.commands.match(expression)
+            
             args = self._get_args(command.execute)
             params = self._find_parameters(possible_parameters, args)
 
