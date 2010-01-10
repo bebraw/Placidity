@@ -1,39 +1,6 @@
-class SpecificHelp:
- 
-    def __init__(self, target_name):
-        '''
-        >>> from mock import Mock
-         
-        >>> clean = Mock()
-        >>> clean.aliases = 'clean'
-        >>> clean.description = 'Cleans up stored variables'
-         
-        >>> commands = Mock()
-        >>> commands.find.return_value = clean
-         
-        >>> help = SpecificHelp('clean')
-        >>> help.execute(commands)
-        'Cleans up stored variables'
-        '''
-        self.target_name = target_name
- 
-    def execute(self, commands):
-        target_command = commands.find(self.target_name)
- 
-        return target_command.description
- 
- 
 class Help:
     aliases = 'help'
- 
-    def matches(self, expression):
-        parts = expression.split()
- 
-        if parts[0] == 'help':
-            if len(parts) > 1:
-                return SpecificHelp(parts[1])
- 
-            return self
+    priority = 'low'
  
     def execute(self, commands):
         '''
