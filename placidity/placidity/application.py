@@ -16,7 +16,16 @@ class Application:
                 result = interpreter.interpret(input)
 
                 if result is not None:
-                    self.output(result)
+                    if isinstance(result, str):
+                        lines = result.split('\n')
+
+                        if len(lines) > 1:
+                            for line in lines:
+                                self.output(line)
+                        else:
+                            self.output(result)
+                    else:
+                        self.output(result)
         except SystemExit:
             pass
 
