@@ -101,6 +101,7 @@ class Assignment:
     def execute(self, expression, commands, variables):
         '''
         >>> from mock import Mock
+        >>> from py.test import raises
 
         >>> python = Mock()
 
@@ -152,45 +153,13 @@ class Assignment:
         {'a': 10, 'b': 10}
 
         Assignment of a result
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 15
         >>> variables = {'a': 10}
         >>> assignment.execute('b=a+5', commands, variables)
         >>> variables
         {'a': 10, 'b': 15}
 
-        Assignment of an invalid variable
-        >>> python.execute = Mock()
-        >>> python.execute.side_effect = NameError("name 'b' is not defined")
-        >>> variables = {}
-        >>> assignment.execute('a=b', commands, variables)
-        "NameError: name 'b' is not defined"
-        >>> variables
-        {}
-        >>> python.execute.side_effect = None
-
-        Assignment of an invalid variable - Multipart case
-        >>> python.execute = Mock()
-        >>> python.execute.side_effect = NameError("name 'c' is not defined")
-        >>> variables = {}
-        >>> assignment.execute('a=b=c', commands, variables)
-        "NameError: name 'c' is not defined"
-        >>> variables
-        {}
-        >>> python.execute.side_effect = None
-
-        Assignment of an invalid variable - Multiple assignment case
-        >>> python.execute = Mock()
-        >>> python.execute.side_effect = NameError("name 'c' is not defined")
-        >>> variables = {}
-        >>> assignment.execute('a,b=c,d', commands, variables)
-        "NameError: name 'c' is not defined"
-        >>> variables
-        {}
-        >>> python.execute.side_effect = None
-
         - expansion
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 5
         >>> variables = {'a': 10}
         >>> assignment.execute('a-=5', commands, variables)
@@ -198,7 +167,6 @@ class Assignment:
         {'a': 5}
 
         + expansion
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 15
         >>> variables = {'a': 10}
         >>> assignment.execute('a+=5', commands, variables)
@@ -206,7 +174,6 @@ class Assignment:
         {'a': 15}
 
         * expansion
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 50
         >>> variables = {'a': 10}
         >>> assignment.execute('a*=5', commands, variables)
@@ -214,7 +181,6 @@ class Assignment:
         {'a': 50}
 
         / expansion
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 2
         >>> variables = {'a': 10}
         >>> assignment.execute('a/=5', commands, variables)
@@ -222,12 +188,44 @@ class Assignment:
         {'a': 2}
 
         % expansion
-        >>> python.execute = Mock()
         >>> python.execute.return_value = 0
         >>> variables = {'a': 10}
         >>> assignment.execute('a%=5', commands, variables)
         >>> variables
         {'a': 0}
+
+        Assignment of an invalid variable
+        >>> python.execute = Mock()
+        >>> python.execute.side_effect = NameError("name 'b' is not defined")
+        >>> variables = {}
+        >>> exception = raises(NameError, assignment.execute, 'a=b', commands,
+        ...     variables)
+        >>> exception.typename
+        'NameError'
+        >>> variables
+        {}
+
+        Assignment of an invalid variable - Multipart case
+        >>> python.execute = Mock()
+        >>> python.execute.side_effect = NameError("name 'c' is not defined")
+        >>> variables = {}
+        >>> exception = raises(NameError, assignment.execute, 'a=b=c',
+        ...     commands, variables)
+        >>> exception.typename
+        'NameError'
+        >>> variables
+        {}
+
+        Assignment of an invalid variable - Multiple assignment case
+        >>> python.execute = Mock()
+        >>> python.execute.side_effect = NameError("name 'c' is not defined")
+        >>> variables = {}
+        >>> exception = raises(NameError, assignment.execute, 'a,b=c,d',
+        ...     commands, variables)
+        >>> exception.typename
+        'NameError'
+        >>> variables
+        {}
         '''
         def set_variables(l_part, r_part):
             python = commands.find('python')
@@ -236,12 +234,7 @@ class Assignment:
                 if r_segment in variables:
                     variables[l_segment] = variables[r_segment]
                 else:
-                    try:
-                        variables[l_segment] = python.execute(r_segment,
-                            variables)
-                    except Exception, e:
-                        class_name = e.__class__.__name__
-                        return class_name + ': ' + str(e)
+                    variables[l_segment] = python.execute(r_segment, variables)
 
         parts = self._split_expression(expression)
 
