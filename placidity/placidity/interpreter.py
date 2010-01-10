@@ -10,36 +10,45 @@ class Commands(list):
         super(Commands, self).__init__(commands)
 
     def match(self, expression):
-        for command in self:
-            if command.matches(expression):
-                return command
+        priorities = ('high', 'normal', 'low')
+
+        for priority in priorities:
+            commands = self.find(priority=priority)
+
+            for command in commands:
+                if command.matches(expression):
+                    return command
+
+    def find(self, priority):
+        return filter(lambda command: command.priority == priority, self)
 
 class Interpreter:
 
     def __init__(self, commands=None):
         self.commands = Commands(commands)
-        self.vars = {}
+        self.variables = {}
 
     def interpret(self, expression):
+        possible_parameters = {'commands': self.commands,
+            'expression': expression, 'variables': self.variables}
+
         try:
-            return eval(expression, {}, self.vars)
-        except NameError:
-            matching_command = self.commands.match(expression)
+            command = self.commands.match(expression)
+            args = self._get_args(command.execute)
+            params = self._find_parameters(possible_parameters, args)
 
-            if matching_command:
-                execute_method = matching_command.execute
-                parameter_name = inspect.getargspec(execute_method)[0][1]
+            return command.execute(**params)
+        except:
+            return 'null'
 
-                if parameter_name == 'variables':
-                    return matching_command.execute(self.vars)
-                else:
-                    return matching_command.execute(self.commands)
-            else:
-                return 'null'
-        except SyntaxError:
-            l_value, r_value = expression.split('=')
-            
-            try:
-                self.vars[l_value] = int(r_value)
-            except ValueError:
-                self.vars[l_value] = self.interpret(r_value)
+    def _get_args(self, method):
+        return inspect.getargspec(method).args
+
+    def _find_parameters(self, possible_parameters, args):
+        ret = {}
+        
+        for name, value in possible_parameters.items():
+            if name in args:
+                ret[name] = value
+
+        return ret
