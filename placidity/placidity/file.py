@@ -44,7 +44,7 @@ class File(TreeNode):
         elif self.type == 'py':
             try:
                 sys.path.append(os.path.dirname(path))
-                module = imp.load_source(path, path)
+                module = imp.load_source(os.path.basename(path), path)
             except Exception, e:
                 print e
                 return
