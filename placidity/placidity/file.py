@@ -1,7 +1,7 @@
-import os.path
 import inspect
 import imp
 import os
+import sys
 from node import TreeNode
 
 class File(TreeNode):
@@ -43,6 +43,7 @@ class File(TreeNode):
                 self.children.append(File(child_path))
         elif self.type == 'py':
             try:
+                sys.path.append(os.path.dirname(path))
                 module = imp.load_source('', path)
             except Exception, e:
                 print e
