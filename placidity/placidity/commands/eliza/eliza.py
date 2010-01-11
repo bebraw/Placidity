@@ -1,9 +1,9 @@
-import pyeliza
+from pyeliza import eliza as therapist
 
 class Eliza:
     aliases = 'eliza'
     description = 'Virtual therapist'
-    _therapist = pyeliza.eliza()
+    _therapist = therapist()
 
     def execute(self, expression, context):
         '''
