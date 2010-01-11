@@ -24,15 +24,20 @@ class Eliza:
         ...     context.owner = None
         >>> context.release.side_effect = release
 
+        >>> context.owner = None
+
         Run Eliza
+        >>> context.owner is None
+        True
         >>> eliza.execute('eliza', context)
         'Hello. How are you feeling today?'
         >>> isinstance(context.owner, Eliza)
         True
 
         Respond
-        >>> eliza.execute('Fine', context)
-        '...'
+        >>> response = eliza.execute('Fine', context)
+        >>> response != 'Hello. How are you feeling today?'
+        True
 
         Quit
         >>> eliza.execute('    quit   ', context)
@@ -44,7 +49,7 @@ class Eliza:
 
         if expression == 'quit':
             context.release()
-        elif context != self:
+        elif context.owner != self:
             context.claim_for(self)
             
             return 'Hello. How are you feeling today?'
