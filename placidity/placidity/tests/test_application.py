@@ -75,3 +75,17 @@ Hello. How are you feeling today?
 '''
 
         self.scenario_tester.test(scenario)
+
+    def test_quit(self):
+        scenario = '''
+>>> a = 10
+>>> a
+10
+>>> quit
+--- not running
+--- restart
+>>> a
+null
+'''
+
+        self.scenario_tester.test(scenario)
