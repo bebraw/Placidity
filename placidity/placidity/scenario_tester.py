@@ -3,32 +3,79 @@ from collections import deque
 class InputError(Exception):
     pass
 
+class NotRunningError(Exception):
+    pass
+
 class MatchError(Exception):
     pass
 
 class OutputError(Exception):
     pass
 
+class RunningError(Exception):
+    pass
+
 class Line:
-    def __init__(self, content):
-        self.content = content
+    def __init__(self, line):
+        self.content = line
 
     def __str__(self):
         return self.content
+
+class PrefixLine(Line):
+    def __init__(self, line):
+        self.content = line.strip(self.prefix)
+
+    @classmethod
+    def matches(cls, line):
+        return line.startswith(cls.prefix)
+
+class Input(PrefixLine):
+    prefix = '>>> '
+
+class Meta(PrefixLine):
+    prefix = '--- '
+
+class Output(Line):
+    @classmethod
+    def matches(cls, line):
+        return True
 
 class EllipsisOutput:
     class Content:
         def __eq__(self, other):
             return True
 
-    def __init__(self):
+    def __init__(self, line):
         self.content = self.Content()
 
-class Input(Line):
-    pass
+    @classmethod
+    def matches(cls, line):
+        return line.startswith('...')
 
-class Output(Line):
-    pass
+class LineParser:
+    line_types = (EllipsisOutput, Input, Meta, Output, )
+
+    def parse(self, scenario):
+        lines = deque()
+
+        for line in scenario.split('\n'):
+            parsed_line = self._parse_line(line)
+
+            if parsed_line:
+                lines.append(parsed_line)
+
+        return lines
+
+    def _parse_line(self, line):
+        line = line.strip()
+
+        if len(line) == 0:
+            return
+
+        for line_type in self.line_types:
+            if line_type.matches(line):
+                return line_type(line)
 
 class ScenarioTester:
     def __init__(self, app_class):
@@ -36,51 +83,49 @@ class ScenarioTester:
         self.app.input = self._input
         self.app.output = self._output
 
-        self.lines = deque()
-
     def test(self, scenario):
         self.parse(scenario)
-        self.app.run()
+        self.app_running = True
+
+        while len(self.lines) > 0:
+            self.app.run()
+            self.app_running = False
+            # set run flag to false on quit!
 
     def parse(self, scenario):
-        self.lines.clear()
-
-        for line in scenario.split('\n'):
-            parsed_line = self._parse_line(line)
-
-            if parsed_line:
-                self.lines.append(parsed_line)
-
-    def _parse_line(self, line):
-        if len(line.strip()) == 0:
-            return
-
-        prefix = '>>> '
-        if line.startswith(prefix):
-            content = line.strip(prefix)
-            return Input(content)
-        elif line.startswith('...'):
-            return EllipsisOutput()
-        else:
-            content = line
-            return Output(content)
+        line_parser = LineParser()
+        self.lines = line_parser.parse(scenario)
 
     def _input(self):
         if len(self.lines) == 0:
             raise SystemExit
 
         current_line = self.lines.popleft()
+        content = str(current_line)
 
         if isinstance(current_line, Input):
-            return str(current_line)
+            self.app_running = True
+            return content
+        elif isinstance(current_line, Meta):
+            # TODO: refactor these to classes!
+
+            if content == 'not running' and self.app_running:
+                raise RunningError, 'The application was expected to be ' + \
+                    'halted but it was running instead!'
+            if content == 'running' and not self.app_running:
+                raise NotRunningError, 'The application was expected to ' + \
+                    'be running but it was halted instead!'
+            if content == 'restart':
+                self.app_running = True
         else:
             raise InputError, 'Expected input but got output instead!' + \
-                ' Failed at line "%s".' % current_line
+                ' Failed at line "%s".' % content
 
     def _output(self, result):
         line = self.lines.popleft()
 
         if isinstance(line, Output):
+            self.app_running = True
             content = line.content
 
             if content != str(result):

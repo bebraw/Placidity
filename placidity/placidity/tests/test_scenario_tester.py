@@ -16,6 +16,9 @@ class AbstractApplication:
         except SystemExit:
             pass
 
+    def interpret(self, input):
+        pass
+
 class TestScenarioTester:
     def test_passing_test(self):
         class Application(AbstractApplication):
