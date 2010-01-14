@@ -1,3 +1,4 @@
+import types
 from collections import deque
 
 class InputError(Exception):
@@ -79,61 +80,61 @@ class LineParser:
 
 class ScenarioTester:
     def __init__(self, app_class):
-        self.app = app_class()
-        self.app.input = self._input
-        self.app.output = self._output
+        self._set_hooks(app_class)
 
     def test(self, scenario):
         self.parse(scenario)
-        self.app_running = True
+        self.app.running = True
 
         while len(self.lines) > 0:
             self.app.run()
-            self.app_running = False
-            # set run flag to false on quit!
+            self.app.running = False
 
     def parse(self, scenario):
         line_parser = LineParser()
         self.lines = line_parser.parse(scenario)
 
-    def _input(self):
-        if len(self.lines) == 0:
-            raise SystemExit
+    def _set_hooks(self, app_class):
+        self.app = app_class()
 
-        current_line = self.lines.popleft()
-        content = str(current_line)
+        def input(app):
+            if len(self.lines) == 0:
+                raise SystemExit
 
-        if isinstance(current_line, Input):
-            self.app_running = True
-            return content
-        elif isinstance(current_line, Meta):
-            # TODO: refactor these to classes!
+            current_line = self.lines.popleft()
+            content = str(current_line)
 
-            if content == 'not running' and self.app_running:
-                raise RunningError, 'The application was expected to be ' + \
-                    'halted but it was running instead!'
-            if content == 'running' and not self.app_running:
-                raise NotRunningError, 'The application was expected to ' + \
-                    'be running but it was halted instead!'
-            if content == 'restart':
-                self.app_running = True
-        else:
-            raise InputError, 'Expected input but got output instead!' + \
-                ' Failed at line "%s".' % content
+            if isinstance(current_line, Input):
+                return content
+            elif isinstance(current_line, Meta):
+                if content == 'not running' and app.running:
+                    raise RunningError, 'The application was expected to be ' + \
+                        'halted but it was running instead!'
+                if content == 'running' and not app.running:
+                    raise NotRunningError, 'The application was expected to ' + \
+                        'be running but it was halted instead!'
+                if content == 'restart':
+                    app.running = True
+            else:
+                raise InputError, 'Expected input but got output instead!' + \
+                    ' Failed at line "%s".' % content
 
-    def _output(self, result):
-        line = self.lines.popleft()
+        self.app.input = types.MethodType(input, self.app, app_class)
 
-        if isinstance(line, Output):
-            self.app_running = True
-            content = line.content
+        def output(app, result):
+            line = self.lines.popleft()
 
-            if content != str(result):
-                raise MatchError, "Output content didn't match!" + \
-                    " Expected %s (%s) but got %s (%s) instead." \
-                    % (content, type(content), result, type(result))
-        elif isinstance(line, EllipsisOutput):
-            pass
-        else:
-            raise OutputError, 'Expected output but got input instead!' + \
-                ' Failed at line "%s". Result: %s.' % (line, result)
+            if isinstance(line, Output):
+                content = line.content
+
+                if content != str(result):
+                    raise MatchError, "Output content didn't match!" + \
+                        " Expected %s (%s) but got %s (%s) instead." \
+                        % (content, type(content), result, type(result))
+            elif isinstance(line, EllipsisOutput):
+                pass
+            else:
+                raise OutputError, 'Expected output but got input instead!' + \
+                    ' Failed at line "%s". Result: %s.' % (line, result)
+
+        self.app.output = types.MethodType(output, self.app, app_class)
