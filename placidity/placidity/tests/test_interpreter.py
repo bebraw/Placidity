@@ -1,5 +1,6 @@
 from mock import Mock
 from placidity.interpreter import Context, Commands, Interpreter
+from py.test import raises
 
 # TODO: convert execute asserts to assert_called_with and handle
 # return with return_value. Note that it's possible to mock the
@@ -69,6 +70,16 @@ class TestInterpreter:
         interpreter = Interpreter()
 
         assert interpreter.interpret('foobar') == 'null'
+
+    def test_system_exit(self):
+        def quit():
+            raise SystemExit
+
+        command = self.create_command('quit', execute_method=quit)
+
+        interpreter = Interpreter(command)
+
+        raises(SystemExit, interpreter.interpret, 'quit')
 
     def test_context_owner_set(self):
         def execute_1():

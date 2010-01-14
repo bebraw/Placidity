@@ -60,6 +60,8 @@ class Interpreter:
             params = self._find_parameters(possible_parameters, args)
 
             return command.execute(**params)
+        except SystemExit, e:
+            raise e
         except:
             return 'null'
 
