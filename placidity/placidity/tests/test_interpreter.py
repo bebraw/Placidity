@@ -71,6 +71,11 @@ class TestInterpreter:
 
         assert interpreter.interpret('foobar') == 'null'
 
+    def test_none(self):
+        interpreter = Interpreter()
+
+        assert interpreter.interpret(None) == None
+
     def test_system_exit(self):
         def quit():
             raise SystemExit

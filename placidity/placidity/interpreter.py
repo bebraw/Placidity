@@ -50,6 +50,9 @@ class Interpreter:
             'commands': self.commands, 'expression': expression,
             'variables': self.variables}
 
+        if expression is None:
+            return
+
         try:
             if self.context.owner:
                 command = self.context.owner
