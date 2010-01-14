@@ -20,8 +20,13 @@ class Line:
     def __init__(self, line):
         self.content = line
 
-    def __str__(self):
-        return self.content
+    def check_input(self, app):
+        raise InputError, 'Expected input but got output instead!' + \
+            ' Failed at line "%s".' % self.content
+
+    def check_output(self, result):
+        raise OutputError, 'Expected output but got input instead!' + \
+            ' Failed at line "%s". Result: %s.' % (self.content, result)
 
 class PrefixLine(Line):
     def __init__(self, line):
@@ -34,15 +39,41 @@ class PrefixLine(Line):
 class Input(PrefixLine):
     prefix = '>>> '
 
+    def check_input(self, app):
+        return self.content
+
 class Meta(PrefixLine):
     prefix = '--- '
+
+    def check_input(self, app):
+        def not_running():
+            if app.running:
+                raise RunningError, 'The application was expected to be ' + \
+                    'halted but it was running instead!'
+
+        def running():
+            if not app.running:
+                raise NotRunningError, 'The application was expected to ' + \
+                    'be running but it was halted instead!'
+
+        def restart():
+            app.running = True
+
+        {'not running': not_running, 'running': running,
+            'restart': restart}[self.content]()
 
 class Output(Line):
     @classmethod
     def matches(cls, line):
         return True
 
-class EllipsisOutput:
+    def check_output(self, result):
+        if self.content != str(result):
+            raise MatchError, "Output content didn't match!" + \
+                " Expected %s (%s) but got %s (%s) instead." \
+                % (self.content, type(self.content), result, type(result))
+
+class EllipsisOutput(Line):
     class Content:
         def __eq__(self, other):
             return True
@@ -53,6 +84,9 @@ class EllipsisOutput:
     @classmethod
     def matches(cls, line):
         return line.startswith('...')
+
+    def check_output(self, result):
+        pass
 
 class LineParser:
     line_types = (EllipsisOutput, Input, Meta, Output, )
@@ -102,39 +136,14 @@ class ScenarioTester:
                 raise SystemExit
 
             current_line = self.lines.popleft()
-            content = str(current_line)
-
-            if isinstance(current_line, Input):
-                return content
-            elif isinstance(current_line, Meta):
-                if content == 'not running' and app.running:
-                    raise RunningError, 'The application was expected to be ' + \
-                        'halted but it was running instead!'
-                if content == 'running' and not app.running:
-                    raise NotRunningError, 'The application was expected to ' + \
-                        'be running but it was halted instead!'
-                if content == 'restart':
-                    app.running = True
-            else:
-                raise InputError, 'Expected input but got output instead!' + \
-                    ' Failed at line "%s".' % content
+            
+            return current_line.check_input(app)
 
         self.app.input = types.MethodType(input, self.app, app_class)
 
         def output(app, result):
-            line = self.lines.popleft()
+            current_line = self.lines.popleft()
 
-            if isinstance(line, Output):
-                content = line.content
-
-                if content != str(result):
-                    raise MatchError, "Output content didn't match!" + \
-                        " Expected %s (%s) but got %s (%s) instead." \
-                        % (content, type(content), result, type(result))
-            elif isinstance(line, EllipsisOutput):
-                pass
-            else:
-                raise OutputError, 'Expected output but got input instead!' + \
-                    ' Failed at line "%s". Result: %s.' % (line, result)
+            return current_line.check_output(result)
 
         self.app.output = types.MethodType(output, self.app, app_class)
