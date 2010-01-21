@@ -37,3 +37,31 @@ class InputThread(threading.Thread):
 
     def get_data(self):
         pass
+
+class RepeatingTimer:
+    def __init__(self, interval, callback):
+        def repeat_callback():
+            callback()
+
+            if self.running:
+                self._timer = self._create_timer()
+                self._timer.start()
+
+        self.interval = interval
+        self.repeat_callback = repeat_callback
+
+    def start(self):
+        self._timer = self._create_timer()
+        self.running = True
+        self._timer.start()
+
+    def _create_timer(self):
+        timer = threading.Timer(self.interval, self.repeat_callback)
+
+        # make sure thread gets killed on app quit
+        timer.daemon = True
+
+        return timer
+
+    def cancel(self):
+        self.running = False
