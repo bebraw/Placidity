@@ -1,9 +1,17 @@
 from mock import patch
 from placidity.application import Application
 from placidity.scenario_tester import ScenarioTester
+from placidity.threads import InputThread
+
+class InputTester(InputThread):
+    def get_data(self):
+        return None
+
+class ApplicationTester(Application):
+    input_source = InputTester
 
 class TestApplication:
-    scenario_tester = ScenarioTester(Application)
+    scenario_tester = ScenarioTester(ApplicationTester)
 
     @patch('__builtin__.raw_input')
     def test_input_prefix(self, input_mock):
