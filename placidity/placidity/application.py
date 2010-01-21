@@ -17,10 +17,7 @@ class Application:
         self.interpreter = Interpreter(commands)
         poller = Poller(self.input_source, self.input_evaluator)
 
-        try:
-            poller.poll()
-        except SystemExit:
-            pass
+        poller.poll()
 
     def input_evaluator(self, user_input):
         if user_input is None:
