@@ -1,3 +1,8 @@
+try:
+    import colorama
+except ImportError:
+    colorama = None
+
 from file import PluginDirectory
 from interpreter import Interpreter
 from plugin_loader import PluginLoader
@@ -5,12 +10,17 @@ from threads import InputThread, Poller
 
 class KeyboardInput(InputThread):
     def get_data(self):
-        return raw_input('>>> ')
+        color = colorama.Fore.GREEN if colorama else ''
+
+        return raw_input(color + '>>> ')
 
 class Application:
     input_source = KeyboardInput
 
     def run(self):
+        if colorama:
+            colorama.init(autoreset=True)
+
         plugin_loader = PluginLoader()
         plugin_directory = PluginDirectory()
         commands = plugin_loader.load(plugin_directory)

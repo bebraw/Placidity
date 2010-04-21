@@ -1,1 +1,3 @@
-This repository is used for development of Placidity between postings of my tutorial series for now.
+This repository contains Placidity, a tiny experiment on REPL with plugin system.
+
+Note that output coloring depends on colorama (http://pypi.python.org/pypi/colorama)!
