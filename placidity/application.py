@@ -1,5 +1,7 @@
 try:
     import colorama
+
+    colorama.init(autoreset=True)
 except ImportError:
     colorama = None
 
