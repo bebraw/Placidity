@@ -5,6 +5,10 @@ class PluginLoader:
 
         for plugin in directory.children:
             plugin_file = plugin.find(name=plugin.name, type='py')
+ 
+            if not plugin_file:
+                continue
+            
             plugin_class = plugin_file.classes[plugin.name]
 
             self._check_attributes(plugin_class)
