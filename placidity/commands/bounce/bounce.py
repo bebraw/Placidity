@@ -1,6 +1,10 @@
 from __future__ import absolute_import
 from threads import RepeatingTimer
-from visual import *
+
+try:
+    from visual import *
+except ImportError:
+    print "Please install VPython in order to bounce!"
 
 class Bounce:
     aliases = 'bounce'
