@@ -15,11 +15,7 @@ class SpecificHelp:
         '''
         parts = expression.split()
 
-        if parts[0] == 'help':
-            if len(parts) == 2:
-                return True
-
-        return False
+        return parts[0] == 'help' and len(parts) == 2
 
     def execute(self, expression, commands):
         '''
