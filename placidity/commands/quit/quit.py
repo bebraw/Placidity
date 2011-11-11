@@ -1,5 +1,5 @@
 class Quit:
-    aliases = ('quit', 'quit()', )
+    aliases = ('quit', 'quit()', ':q', )
     description = 'Quits the application'
 
     def execute(self):
