@@ -8,7 +8,7 @@ except ImportError:
 # TODO: figure out how to get rid of warning caused by the import!
 
 class Ls:
-    aliases = ('ls', )
+    aliases = 'ls'
     description = 'Lists contents of the current directory'
 
     def execute(self):
