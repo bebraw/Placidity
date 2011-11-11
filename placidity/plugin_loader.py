@@ -8,8 +8,12 @@ class PluginLoader:
  
             if not plugin_file:
                 continue
-            
-            plugin_class = plugin_file.classes[plugin.name]
+
+            plugin_class = plugin_file.classes.get(plugin.name)
+
+            if not plugin_class:
+                print 'Plugin file is missing proper class!', plugin.name, plugin_file.classes
+                continue
 
             self._check_attributes(plugin_class)
 
