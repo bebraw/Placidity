@@ -4,6 +4,7 @@ import os
 class Cd:
     aliases = 'cd'
     description = 'Change working directory'
+    prev = os.getcwd()
 
     def matches(self, expression):
         parts = expression.split()
@@ -14,12 +15,17 @@ class Cd:
         target = expression.split()[1]
         target = variables.get(target, target)
 
-        # TODO: - -> prev
         if target == "~":
-            target = homedir = os.path.expanduser('~')
+            target = os.path.expanduser('~')
+
+        if target == "-":
+            target = self.prev
 
         try:
-            os.chdir(os.path.join(os.getcwd(), target))
+            cwd = os.getcwd()
+            target_dir = os.path.join(cwd, target)
+            os.chdir(target_dir)
+            self.prev = cwd
         except IOError:
             return "Directory not found!"
 
