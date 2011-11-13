@@ -14,7 +14,9 @@ class Cd:
         target = expression.split()[1]
         target = variables.get(target, target)
 
-        # TODO: ~ -> home, - -> prev
+        # TODO: - -> prev
+        if target == "~":
+            target = homedir = os.path.expanduser('~')
 
         try:
             os.chdir(os.path.join(os.getcwd(), target))
