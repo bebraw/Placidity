@@ -240,13 +240,13 @@ class Assignment:
         {}
         '''
         def set_variables(l_part, r_part):
-            python = commands.find('python')
-
+            system = commands.find('system')
+            
             for l_segment, r_segment in zip(l_part.segments, r_part.segments):
                 if r_segment in variables:
                     variables[l_segment] = variables[r_segment]
                 else:
-                    variables[l_segment] = python.execute(r_segment, variables)
+                    variables[l_segment] = system.execute(r_segment, variables)
 
         parts = self._split_expression(expression)
 

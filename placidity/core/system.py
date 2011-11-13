@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import os
+import subprocess
 
 class System:
     priority = 'low'
@@ -26,9 +26,10 @@ class System:
         #'NameError'
         '''
         try:
-            eval(expression, {}, variables)
+            return eval(expression, {}, variables)
         except Exception:
-            val = os.system(expression)
+            p = subprocess.Popen(expression.split(' ') , stdout=subprocess.PIPE)
+            return p.communicate()[0]
 
 if __name__ == "__main__":
     import doctest

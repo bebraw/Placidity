@@ -65,8 +65,9 @@ class Interpreter:
             return command.execute(**params)
         except SystemExit, e:
             raise e
-        except:
-            return 'null'
+        # DEBUG!
+        #except:
+        #    return 'null'
 
     def _get_args(self, method):
         return inspect.getargspec(method).args
