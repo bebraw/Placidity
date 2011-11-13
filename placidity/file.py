@@ -13,6 +13,9 @@ class File(TreeNode):
         self.__init_structure(parts)
         self.__init_classes(path)
 
+    def __unicode__(self):
+        return self.name
+
     def __init_attributes(self, path, name=None):
         parts = []
         self.name = name
@@ -38,12 +41,14 @@ class File(TreeNode):
             return
 
         if os.path.isdir(path):
+            sys.path.append(path)
+
             for child in os.listdir(path):
                 child_path = os.path.join(path, child)
                 self.children.append(File(child_path))
         elif self.type == 'py':
             try:
-                sys.path.append(os.path.dirname(path))
+                #sys.path.append(os.path.dirname(path))
                 module = imp.load_source(os.path.basename(path), path)
             except Exception, e:
                 print e
@@ -68,7 +73,7 @@ class PluginDirectory(File):
 
     @property
     def plugin_path(self):
-        return os.path.join(self.current_directory, 'commands')
+        return os.path.join(self.current_directory, 'core')
 
     @property
     def current_directory(self):

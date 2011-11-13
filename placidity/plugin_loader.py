@@ -4,15 +4,12 @@ class PluginLoader:
         ret = []
 
         for plugin in directory.children:
-            plugin_file = plugin.find(name=plugin.name, type='py')
- 
-            if not plugin_file:
+            if plugin.name == '__init__':
                 continue
 
-            plugin_class = plugin_file.classes.get(plugin.name)
-
+            plugin_class = plugin.classes.get(plugin.name)
             if not plugin_class:
-                print 'Plugin file is missing proper class!', plugin.name, plugin_file.classes
+                print 'Plugin file is missing proper class!', plugin.name, plugin.classes
                 continue
 
             self._check_attributes(plugin_class)

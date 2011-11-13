@@ -20,9 +20,6 @@ class Application:
     input_source = KeyboardInput
 
     def run(self):
-        if colorama:
-            colorama.init(autoreset=True)
-
         plugin_loader = PluginLoader()
         plugin_directory = PluginDirectory()
         commands = plugin_loader.load(plugin_directory)
