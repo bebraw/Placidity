@@ -10,8 +10,14 @@ class Cd:
 
         return parts[0] == 'cd' and len(parts) == 2
 
-    def execute(self, expression):
+    def execute(self, expression, variables):
         target = expression.split()[1]
+        target = variables.get(target, target)
 
-        os.chdir(os.path.join(os.getcwd(), target))
+        # TODO: ~ -> home, - -> prev
+
+        try:
+            os.chdir(os.path.join(os.getcwd(), target))
+        except IOError:
+            return "Directory not found!"
 
