@@ -28,8 +28,11 @@ class System:
         try:
             return eval(expression, {}, variables)
         except Exception:
-            p = subprocess.Popen(expression.split(' ') , stdout=subprocess.PIPE)
-            return p.communicate()[0]
+            try:
+                p = subprocess.Popen(expression.split(' ') , stdout=subprocess.PIPE)
+                return p.communicate()[0]
+            except OSError:
+                return "Invalid system command!"
 
 if __name__ == "__main__":
     import doctest
