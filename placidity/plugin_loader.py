@@ -4,7 +4,7 @@ class PluginLoader:
         ret = []
 
         for plugin in directory.children:
-            if plugin.name == '__init__':
+            if plugin.name == '__init__' or plugin.type != 'py':
                 continue
 
             plugin_class = plugin.classes.get(plugin.name)

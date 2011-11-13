@@ -41,14 +41,12 @@ class File(TreeNode):
             return
 
         if os.path.isdir(path):
-            sys.path.append(path)
-
             for child in os.listdir(path):
                 child_path = os.path.join(path, child)
                 self.children.append(File(child_path))
         elif self.type == 'py':
             try:
-                #sys.path.append(os.path.dirname(path))
+                sys.path.append(os.path.dirname(path))
                 module = imp.load_source(os.path.basename(path), path)
             except Exception, e:
                 print e
@@ -68,14 +66,9 @@ class File(TreeNode):
 
 class PluginDirectory(File):
 
-    def __init__(self):
-        super(PluginDirectory, self).__init__(self.plugin_path)
+    def __init__(self, plugin_dir):
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        full_dir = os.path.join(current_dir, plugin_dir)
 
-    @property
-    def plugin_path(self):
-        return os.path.join(self.current_directory, 'core')
+        super(PluginDirectory, self).__init__(full_dir)
 
-    @property
-    def current_directory(self):
-        # http://code.activestate.com/recipes/474083/#c8
-        return os.path.dirname(os.path.realpath(__file__))

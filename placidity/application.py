@@ -21,7 +21,7 @@ class Application:
 
     def run(self):
         plugin_loader = PluginLoader()
-        plugin_directory = PluginDirectory()
+        plugin_directory = PluginDirectory('core')
         commands = plugin_loader.load(plugin_directory)
         self.interpreter = Interpreter(commands)
         poller = Poller(self.input_source, self.input_evaluator)
