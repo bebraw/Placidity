@@ -11,6 +11,7 @@ from file import PluginDirectory
 from interpreter import Interpreter
 from plugin_loader import PluginLoader
 from threads import InputThread, Poller
+import __init__
 
 class KeyboardInput(InputThread):
     def get_data(self):
@@ -25,13 +26,18 @@ class Application:
         plugin_loader = PluginLoader()
         plugin_directory = PluginDirectory('core')
         commands = plugin_loader.load(plugin_directory)
-        
+
+        self._welcome()
+
         self._init_completion(commands)
         
         self.interpreter = Interpreter(commands)
         
         poller = Poller(self.input_source, self.input_evaluator)
         poller.poll()
+
+    def _welcome(self):
+        print 'Placidity ' + __init__.__version__
 
     def _init_completion(self, commands):
         # http://stackoverflow.com/questions/2046050/tab-completion-in-python-command-line-interface-how-to-catch-tab-events
