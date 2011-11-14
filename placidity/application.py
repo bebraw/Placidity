@@ -75,3 +75,12 @@ class Application:
 
     def output(self, result):
         print result
+
+def main():
+    application = Application()
+
+    application.run()
+
+if __name__ == '__main__':
+    main()
+
