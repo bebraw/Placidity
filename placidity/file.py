@@ -69,6 +69,6 @@ class PluginDirectory(File):
     def __init__(self, plugin_dir):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         full_dir = os.path.join(current_dir, plugin_dir)
-
+        print current_dir, full_dir
         super(PluginDirectory, self).__init__(full_dir)
 
